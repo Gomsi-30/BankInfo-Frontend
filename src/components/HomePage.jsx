@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import '../styles/bankform.css';
-import axios from 'axios';
 import toast , {Toaster} from 'react-hot-toast'; 
 import { useNavigate } from 'react-router-dom';
 
@@ -22,24 +21,41 @@ const HomePage = () => {
   });
 
   const onSubmit = async (data) => {
-    const token =localStorage.getItem('token');
-  
+    const token = localStorage.getItem('token');
+    console.log(token);
     if (!token) {
       toast.error('You must be logged in to add bank account details.');
-      return; 
+      return;
     }
-    try{
-    const result = await axios.post('https://bank-info-backend.vercel.app/api/createbank', data, { withCredentials: true });
-    console.log('Bank Account Details:', result.data);
-    toast.success('Bank Account Details added successfully');
-    navigate('/allbanks');
     
-    }catch(e){
+    try {
+      const response = await fetch('https://bank-info-backend.vercel.app/api/createbank', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add bank account details');
+      }
+  
+      const result = await response.json();
+      console.log('Bank Account Details:', result);
+      toast.success('Bank Account Details added successfully');
+      navigate('/allbanks');
+      
+    } catch (e) {
       console.log(e.message);
-      toast.error(e.message)
+      toast.error(e.message);
     }
+    
     reset();
   };
+  
 
   return (
     <div className="bank-account-container">

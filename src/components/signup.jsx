@@ -6,7 +6,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
-import axios from 'axios';
 
 const signupSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -34,19 +33,40 @@ const AuthForm = () => {
 
   const onSubmit = async (data) => {
     console.log(data);
-    if (isSignup) {
-
-      const result = await axios.post('https://bank-info-backend.vercel.app/api/register', data, { withCredentials: true });
-      localStorage.setItem('token', result.data.token);
-      console.log(result.data)
-    } else {
-      const result = await axios.post('https://bank-info-backend.vercel.app/api/login', data, { withCredentials: true });
-      localStorage.setItem('token', result.data.token);
-      console.log(result.data);
+    
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(data)
+    };
+  
+    try {
+      let response;
+  
+      if (isSignup) {
+        response = await fetch('https://bank-info-backend.vercel.app/api/register', options);
+      } else {
+        response = await fetch('https://bank-info-backend.vercel.app/api/login', options);
+      }
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        localStorage.setItem('token', result.token);
+        console.log(result);
+        router('/');
+        reset();
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error during submission:', error);
     }
-    router('/');
-    reset();
   };
+  
 
   const onError = () => {
     toast.error('Invalid input');

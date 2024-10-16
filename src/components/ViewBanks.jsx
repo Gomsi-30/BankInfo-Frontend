@@ -33,7 +33,7 @@ const BankAccounts = () => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:3001/api/updatebank/${editingAccount._id}`, editingAccount,{withCredentials: true});
+            const response = await axios.put(`https://bank-info-backend.vercel.app/api/updatebank/${editingAccount._id}`, editingAccount,{withCredentials: true});
             setAccounts(accounts.map((acc) => (acc._id === editingAccount._id ? response.data : acc)));
             setEditingAccount(null);
         } catch (err) {
@@ -49,7 +49,7 @@ const BankAccounts = () => {
     const handleDeleteConfirm = async () => {
         try {
             console.log('fn called')
-            await axios.delete(`http://localhost:3001/api/deletebank/${selectedAccountId}`,{withCredentials: true});
+            await axios.delete(`https://bank-info-backend.vercel.app/api/deletebank/${selectedAccountId}`,{withCredentials: true});
             setAccounts(accounts.filter((acc) => acc._id !== selectedAccountId));
             setShowDeleteConfirm(false);
         } catch (err) {

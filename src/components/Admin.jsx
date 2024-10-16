@@ -16,15 +16,29 @@ const AdminLogin = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-
+    
         try {
-            const response = await axios.post('https://bank-info-backend.vercel.app/api/login', {
-                email,
-                password,
-            },{withCredentials: true});
-            console.log('Login successful:', response.data);
+            const response = await fetch('https://bank-info-backend.vercel.app/api/loginadmin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', 
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Invalid email or password');
+            }
+    
+            const data = await response.json();
+            console.log('Login successful:', data);
             toast.success('Login successful!');
             navigate('/adminhome');
+    
         } catch (err) {
             toast.error('Invalid email or password');
             setError('Invalid email or password');
@@ -32,6 +46,7 @@ const AdminLogin = () => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="login-container">
